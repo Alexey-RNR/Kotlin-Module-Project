@@ -1,54 +1,71 @@
 // класс работы с заметками
 
-class NoteMenu(private val archive: Archive) : CommonMenu() {
+class NoteMenu : CommonMenu<Pair<String, String>>(
+    mutableListOf(), MenuUtils(), "заметок", "Создать заметку"
+) {
 
-    init {
-        noteMenu()
-    }
+    override fun menuItemSelected(item: Pair<String, String>) {
+        println("Заметка: ${item.first}")
+        println("Текст заметки:\n${item.second}")
 
-    private fun noteMenu() {
-        val options = listOf(
-            Pair("Создать новую заметку", ::createNewNote),
-            Pair("Выбрать заметку", ::selectNote)
-        )
+        println("Выберите действие:")
+        println("0. Добавить текст")
+        println("1. Выход")
 
-        showMenu(options)
-    }
+        val choice = menuUtils.readInput()
 
-    private fun createNewNote() {
-        print("Введите заголовок новой заметки: ")
-        val noteTitle = scanner.nextLine().trim()
-
-        if (noteTitle.isNotBlank()) {
-            print("Введите содержание заметки: ")
-            val noteContent = scanner.nextLine().trim()
-
-            if (noteContent.isNotBlank()) {
-                archive.notes.add(Note(noteTitle, noteContent))
-                println("Заметка '$noteTitle' создана.")
-            } else {
-                println("Содержание заметки не может быть пустым.")
+        when (choice) {
+            0 -> {
+                appendContent(item)
             }
-        } else {
-            println("Заголовок заметки не может быть пустым.")
-        }
 
-        noteMenu()
+            1 -> {
+                return
+            }
+
+            else -> {
+                println("Некорректный ввод. Пожалуйста выберите 0 или 1.")
+            }
+        }
     }
 
-    private fun selectNote() {
-        if (archive.notes.isEmpty()) {
-            println("Нет доступных заметок. Пожалуйста, создайте хотя бы одну.")
-            noteMenu()
+    override fun createItem() {
+        println("Введите название заметки:")
+        val title = readln().trim()
+        if (title.isEmpty()) {
+            println("Название заметки не может быть пустым.")
             return
         }
 
-        val options = archive.notes.mapIndexed { index, note ->
-            Pair(index.toString(), { ViewNote(note) as Any? })
-        }.toMutableList()
+        println("Введите текст заметки:")
+        val content = readln().trim()
+        if (content.isEmpty()) {
+            println("Текст заметки не может быть пустым.")
+            return
+        }
 
-        options.add(Pair("Назад", {}))
+        items.add(Pair(title, content))
+        println("Заметка \"$title\" успешно создана.")
+    }
 
-        showMenu(options)
+    private fun appendContent(item: Pair<String, String>) {
+        println("Введите текст, который вы хотите добавить:")
+        val additionalText = readln().trim()
+        if (additionalText.isNotEmpty()) {
+            val updateContent = item.second + "\n" + additionalText
+            val index = items.indexOf(item)
+            if (index != -1) {
+                items[index] = Pair(item.first, updateContent)
+                println("Текст успешно добавлен в заметку \"${item.first}\".")
+            } else {
+                println("Ошибка: Не удалось найти заметку.")
+            }
+        } else {
+            println("Поле ввода текста не может оставаться пустым.")
+        }
+    }
+
+    fun show() {
+        showMenu()
     }
 }

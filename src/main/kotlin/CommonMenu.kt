@@ -1,37 +1,41 @@
 // класс для методов работы с меню и обработкой ввода
 
-import java.util.Scanner
-import java.util.InputMismatchException
+abstract class CommonMenu<T>(
+    protected val items: MutableList<T>,
+    protected val menuUtils: MenuUtils,
+    private val itemType: String,
+    private val createOption: String
+) {
 
-abstract class CommonMenu {
+    protected abstract fun menuItemSelected(item: T)
 
-    protected var scanner = Scanner(System.`in`)
+    protected abstract fun createItem()
 
-    protected fun showMenu(options: List<Pair<String, () -> Any?>>) {
-        println("Доступные опции:")
-
-        options.forEachIndexed { index, option ->
-            println("${index + 1}. ${option.first}")
-        }
-
-        println("0. Назад")
-
+    fun showMenu() {
         while (true) {
-            print("Введите номер опции: ")
+            println("\nСписок $itemType:")
+            println("0. $createOption")
+            showItems()
+            println("${items.size + 1}. Выход")
 
-            try {
-                val choice = scanner.nextInt()
+            val choice = menuUtils.readInput()
+            if (choice == items.size + 1) return
 
-                if (choice == 0) {
-                    return
-                } else if (choice in 1..options.size) {
-                    options[choice - 1].second.invoke()
-                } else {
-                    println("Неверная цифра! Введите число от 1 до ${options.size}")
-                }
-            } catch (e: InputMismatchException) {
-                println("Пожалуйста, введите число!")
-                scanner.nextLine() // Очистка буфера
+            when (choice) {
+                0 -> createItem()
+                in 1..items.size -> menuItemSelected(items[choice - 1])
+                else -> println("Некорректный выбор. Пожалуйста, введите число от 0 до ${items.size + 1}")
+            }
+        }
+    }
+
+    private fun showItems() = if (items.isEmpty()) {
+    } else {
+        items.forEachIndexed { index, item ->
+            when (item) {
+                is Pair<*, *> -> println("${index + 1}. ${item.first}")
+                is String -> println("${index + 1}. $item")
+                else -> println("${index + 1}. Неверный ввод")
             }
         }
     }

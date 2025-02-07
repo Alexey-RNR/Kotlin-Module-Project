@@ -1,5 +1,6 @@
-// Точка входа в программу
+// Вход в программу
 
 fun main() {
-    ArchiveMenu()
+    val archiveMenu = ArchiveMenu()
+    archiveMenu.show()
 }

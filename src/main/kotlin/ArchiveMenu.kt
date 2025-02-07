@@ -1,51 +1,28 @@
 // класс работы с архивами
 
-class ArchiveMenu : CommonMenu() {
+class ArchiveMenu : CommonMenu<String>(
+    mutableListOf(), MenuUtils(), "архивов", "Создать архив"
+) {
 
-    companion object {
-        private var archives: MutableList<Archive> = mutableListOf()
+    private val noteMenu = NoteMenu()
+
+    override fun menuItemSelected(item: String) {
+        println("Выбран архив: $item")
+        noteMenu.show()
     }
 
-    init {
-        mainMenu()
-    }
-
-    private fun mainMenu() {
-        val options = listOf(
-            Pair("Создать новый архив", ::createNewArchive),
-            Pair("Выбрать архив", ::selectArchive)
-        )
-
-        showMenu(options)
-    }
-
-    private fun createNewArchive() {
-        print("Введите имя нового архива: ")
-        val archiveName = scanner.nextLine().trim()
-
-        if (archiveName.isNotBlank()) {
-            archives.add(Archive(archiveName, mutableListOf()))
-            println("Архив '$archiveName' создан.")
+    override fun createItem() {
+        println("Введите название архива:")
+        val name = readln().trim()
+        if (name.isNotEmpty()) {
+            items.add(name)
+            println("Архив \"$name\" успешно создан.")
         } else {
-            println("Имя архива не может быть пустым.")
+            println("Название архива не может быть пустым, введите название.")
         }
-
-        mainMenu()
     }
 
-    private fun selectArchive() {
-        if (archives.isEmpty()) {
-            println("Нет доступных архивов. Пожалуйста, создайте хотя бы один.")
-            mainMenu()
-            return
-        }
-
-        val options = archives.mapIndexed { index, archive ->
-            Pair(index.toString(), { NoteMenu(archive) as Any? })
-        }.toMutableList()
-
-        options.add(Pair("Назад", {}))
-
-        showMenu(options)
+    fun show() {
+        showMenu()
     }
 }
