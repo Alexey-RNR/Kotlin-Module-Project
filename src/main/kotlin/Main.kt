@@ -1,3 +1,6 @@
-fun main(args: Array<String>) {
-    println("Hello World!")
+// Вход в программу
+
+fun main() {
+    val archiveMenu = ArchiveMenu()
+    archiveMenu.show()
 }
